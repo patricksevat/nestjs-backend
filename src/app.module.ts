@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserModule } from './user/user.module';
-import { EventModule } from './event/event.module';
 import { V1Module } from './v1/v1.module';
+import { RouterModule } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -13,9 +12,15 @@ import { V1Module } from './v1/v1.module';
       username: 'root',
       password: 'root',
       database: 'didomi',
-      entities: [],
-      synchronize: !!process.env.PRODUCTION,
+      autoLoadEntities: true,
+      synchronize: true,
     }),
+    RouterModule.register([
+      {
+        path: 'v1',
+        module: V1Module,
+      },
+    ]),
     V1Module,
   ],
   controllers: [],
