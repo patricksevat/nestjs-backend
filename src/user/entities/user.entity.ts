@@ -19,3 +19,14 @@ export class User {
   @ManyToOne(() => Event, (event) => event.user)
   events: Event[];
 }
+
+export interface IConsent {
+  id: 'email_notifications' | 'sms_notifications';
+  enabled: boolean;
+}
+
+export interface IUserResponse {
+  id: string;
+  email: string;
+  consents?: IConsent[]; // The EventsToConsentInterceptor guarantees consents is defined
+}
