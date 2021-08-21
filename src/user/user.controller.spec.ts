@@ -4,22 +4,32 @@ import { UserService } from './user.service';
 import { isUUID } from '@nestjs/common/utils/is-uuid';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
+import { v4 as uuidv4 } from 'uuid';
+
+const mockUserRepository = {
+  findOne: jest.fn(),
+  create: jest.fn(),
+  save: jest.fn((user: User, userId = uuidv4()) => {
+    return {
+      ...user,
+      id: userId,
+    };
+  }),
+};
 
 describe('UserController', () => {
   let controller: UserController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
+      controllers: [UserController],
+      providers: [
         UserService,
         {
-          // TODO figure out how this works
           provide: getRepositoryToken(User),
-          useValue: {},
+          useValue: mockUserRepository,
         },
       ],
-      controllers: [UserController],
-      providers: [UserService],
     }).compile();
 
     controller = module.get<UserController>(UserController);
@@ -36,6 +46,8 @@ describe('UserController', () => {
 
     expect(newUser.email).toBeTruthy();
     expect(isUUID(newUser.id)).toBe(true);
-    expect(Array.isArray(newUser.consents)).toBe(true);
+
+    // Testing interceptors as a part of the request flow can only be done in e2e and partial integration test
+    expect(newUser.consents).toBe(undefined);
   });
 });
