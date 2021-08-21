@@ -7,6 +7,7 @@ import { User } from './entities/user.entity';
 import { mockUserRepository } from './mocks/user-repository';
 import { mockUsers } from './mocks/user';
 import { messages } from './constants/messages';
+import { UserNotDeletedError, UserNotFoundError } from './constants/errors';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -49,11 +50,13 @@ describe('UserController', () => {
   });
 
   it('should return a message if user could not be found', async function () {
-    const id = 'my_uuid';
-    const response = (await controller.findOne(id)) as {
-      message: string;
-    };
-    expect(response.message).toBe(messages.idNotFound(id));
+    expect.assertions(1);
+    try {
+      const id = 'my_uuid';
+      await controller.findOne(id);
+    } catch (e) {
+      expect(e instanceof UserNotFoundError).toBe(true);
+    }
   });
 
   it('should return a message upon deleting a user', async function () {
@@ -64,7 +67,11 @@ describe('UserController', () => {
 
   it('should return a message if user could not be deleted', async function () {
     mockUserRepository.update.mockReturnValueOnce({ affected: 0 });
-    const response = await controller.remove('my_uuid');
-    expect(response.message).toBe(messages.userNotDeleted);
+    expect.assertions(1);
+    try {
+      await controller.remove('my_uuid');
+    } catch (e) {
+      expect(e instanceof UserNotDeletedError).toBe(true);
+    }
   });
 });

@@ -6,7 +6,6 @@ import {
   Param,
   Delete,
   UseInterceptors,
-  HttpException,
   UseFilters,
 } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -23,9 +22,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  async create(
-    @Body() createUserDto: CreateUserDto,
-  ): Promise<IUserResponse | HttpException> {
+  async create(@Body() createUserDto: CreateUserDto): Promise<IUserResponse> {
     return await this.userService.create(createUserDto);
   }
 
