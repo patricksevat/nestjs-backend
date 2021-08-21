@@ -2,10 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Repository, TypeORMError } from 'typeorm';
+import { Repository } from 'typeorm';
 import {
   DuplicateEmailError,
   TypeOrmErrors,
+  UserNotDeletedError,
   UserNotFoundError,
 } from './constants/errors';
 
@@ -42,7 +43,15 @@ export class UserService {
     return foundUser;
   }
 
-  remove(id: string) {
-    return this.userRepository.update({ id, active: true }, { active: false });
+  async remove(id: string) {
+    const { affected } = await this.userRepository.update(
+      { id, active: true },
+      { active: false },
+    );
+    if (affected > 0) {
+      return true;
+    }
+
+    throw new UserNotDeletedError(id);
   }
 }
