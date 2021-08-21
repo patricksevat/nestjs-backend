@@ -13,6 +13,9 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ default: true })
+  active: boolean;
+
   @Column()
   email: string;
 

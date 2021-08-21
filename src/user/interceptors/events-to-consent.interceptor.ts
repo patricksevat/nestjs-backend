@@ -6,21 +6,24 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { User } from '../entities/user.entity';
+import { IUserResponse, User } from '../entities/user.entity';
 
 @Injectable()
 export class EventsToConsentInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
-      map((user: User) => {
-        if (!user.events) {
-          return {
-            ...user,
-            consents: [],
-          };
+      map((value) => {
+        if (value instanceof User) {
+          if (!value.events) {
+            return {
+              id: value.id,
+              email: value.email,
+              consents: [],
+            };
+          }
         }
 
-        return user;
+        return value;
       }),
     );
   }

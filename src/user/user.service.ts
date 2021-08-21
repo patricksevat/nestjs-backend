@@ -18,11 +18,14 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  findOne(id: string) {
+    return this.userRepository.findOne({
+      id,
+      active: true,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  remove(id: string) {
+    return this.userRepository.update({ id, active: true }, { active: false });
   }
 }
