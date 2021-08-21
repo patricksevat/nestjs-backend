@@ -4,18 +4,7 @@ import { UserService } from './user.service';
 import { isUUID } from '@nestjs/common/utils/is-uuid';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { v4 as uuidv4 } from 'uuid';
-
-const mockUserRepository = {
-  findOne: jest.fn(),
-  create: jest.fn(),
-  save: jest.fn((user: User, userId = uuidv4()) => {
-    return {
-      ...user,
-      id: userId,
-    };
-  }),
-};
+import { mockUserRepository } from './mocks/user-repository';
 
 describe('UserController', () => {
   let controller: UserController;
