@@ -6,41 +6,44 @@ import {
   Param,
   Delete,
   UseInterceptors,
+  HttpException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { EventsToConsentInterceptor } from './interceptors/events-to-consent.interceptor';
 import { IUserResponse } from './entities/user.entity';
 import { messages } from './constants/messages';
+import { DuplicateEmailError, UserNotFoundError } from './constants/errors';
 
 @UseInterceptors(EventsToConsentInterceptor)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  // TODO
-  // Think about the responsibilities between controller and service
-  // What should each do?
-  // Business logic should reside in service, as do db calls
-  // We could make the controller then respond to switch statements or async await try catch blocks
-  // Thinking about try catch blocks, we could utilize https://docs.nestjs.com/exception-filters
-  // case success => return result
-  // case
-  // TODO
-
   @Post()
-  create(@Body() createUserDto: CreateUserDto): Promise<IUserResponse> {
-    return this.userService.create(createUserDto);
+  async create(
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<IUserResponse | HttpException> {
+    try {
+      return await this.userService.create(createUserDto);
+    } catch (e) {
+      if (e instanceof DuplicateEmailError) {
+        throw e.errorResponse;
+      }
+      throw e;
+    }
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    const user = await this.userService.findOne(id);
-    return (
-      user || {
-        message: messages.idNotFound(id),
+    try {
+      return await this.userService.findOne(id);
+    } catch (e) {
+      if (e instanceof UserNotFoundError) {
+        throw e.errorResponse;
       }
-    );
+      throw e;
+    }
   }
 
   @Delete(':id')

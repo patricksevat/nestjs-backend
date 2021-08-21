@@ -2,7 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { Repository, TypeORMError } from 'typeorm';
+import {
+  DuplicateEmailError,
+  TypeOrmErrors,
+  UserNotFoundError,
+} from './constants/errors';
 
 @Injectable()
 export class UserService {
@@ -11,18 +16,30 @@ export class UserService {
     private userRepository: Repository<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    // TODO catch duplicate email
-    const user = new User();
-    Object.assign(user, createUserDto);
-    return this.userRepository.save(user);
+  async create(createUserDto: CreateUserDto): Promise<User | any> {
+    try {
+      const user = new User();
+      Object.assign(user, createUserDto);
+      return await this.userRepository.save(user);
+    } catch (e) {
+      if (e?.message?.includes(TypeOrmErrors.duplicateKeyConstraint)) {
+        throw new DuplicateEmailError();
+      }
+      throw e;
+    }
   }
 
-  findOne(id: string) {
-    return this.userRepository.findOne({
+  async findOne(id: string) {
+    const foundUser = await this.userRepository.findOne({
       id,
       active: true,
     });
+
+    if (!foundUser) {
+      throw new UserNotFoundError(id);
+    }
+
+    return foundUser;
   }
 
   remove(id: string) {
