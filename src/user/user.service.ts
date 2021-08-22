@@ -17,7 +17,7 @@ export class UserService {
     private userRepository: Repository<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User | any> {
+  async create(createUserDto: CreateUserDto): Promise<User | Error> {
     try {
       const user = new User();
       Object.assign(user, createUserDto);

@@ -11,7 +11,7 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { EventsToConsentInterceptor } from './interceptors/events-to-consent.interceptor';
-import { IUserResponse } from './entities/user.entity';
+import { IUserResponse, User } from './entities/user.entity';
 import { messages } from './constants/messages';
 import { UserExceptionFilter } from './exception-filters/user-exception-filters';
 
@@ -23,7 +23,7 @@ export class UserController {
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto): Promise<IUserResponse> {
-    return await this.userService.create(createUserDto);
+    return (await this.userService.create(createUserDto)) as User;
   }
 
   @Get(':id')
