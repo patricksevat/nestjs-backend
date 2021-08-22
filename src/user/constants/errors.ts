@@ -1,4 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
+import { messages } from './messages';
 
 export const TypeOrmErrors = {
   duplicateKeyConstraint: 'duplicate key value violates unique constraint',
@@ -14,7 +15,7 @@ export class UserServiceError extends Error {
 
 export class DuplicateEmailError extends UserServiceError {
   constructor() {
-    super('a user already exists with this email');
+    super(messages.duplicateEmailError);
     this.name = 'DuplicateEmailError';
   }
 
@@ -26,7 +27,7 @@ export class DuplicateEmailError extends UserServiceError {
 
 export class UserNotFoundError extends UserServiceError {
   constructor(id: string) {
-    super(`a user could not be found for id ${id}`);
+    super(messages.idNotFound(id));
     this.name = 'UserNotFoundError';
   }
 
@@ -38,7 +39,7 @@ export class UserNotFoundError extends UserServiceError {
 
 export class UserNotDeletedError extends UserServiceError {
   constructor(id: string) {
-    super(`user ${id} could not be deleted`);
+    super(messages.userNotDeleted(id));
     this.name = 'UserNotDeletedError';
   }
 
