@@ -4,10 +4,12 @@ import { EventEntity } from '../entities/event.entity';
 export const mockEventRepository = {
   findOne: jest.fn(),
   update: jest.fn(),
-  save: jest.fn((event: EventEntity, id = uuidv4()) => {
-    return {
-      ...event,
-      id: id,
-    };
+  save: jest.fn((events: EventEntity[], id = uuidv4()) => {
+    return [
+      {
+        ...events[0],
+        id: id,
+      },
+    ];
   }),
 };
