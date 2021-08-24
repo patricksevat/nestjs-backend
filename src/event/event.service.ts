@@ -18,7 +18,7 @@ export class EventService {
     return this.createEvent(createEventDto);
   }
 
-  async createEvent(createEventDto: CreateEventDto) {
+  private async createEvent(createEventDto: CreateEventDto) {
     const newEvent = new EventEntity();
     newEvent.user = await this.userService.findOne(createEventDto.user.id);
 
@@ -28,7 +28,10 @@ export class EventService {
     return this.eventsRepository.save(newEvent);
   }
 
-  deactivateEvent(userId) {
-    return this.eventsRepository.update({ user: userId }, { active: false });
+  private deactivateEvent(userId) {
+    return this.eventsRepository.update(
+      { user: userId, active: true },
+      { active: false },
+    );
   }
 }

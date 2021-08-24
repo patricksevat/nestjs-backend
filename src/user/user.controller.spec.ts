@@ -5,9 +5,11 @@ import { isUUID } from '@nestjs/common/utils/is-uuid';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { mockUserRepository } from './mocks/user-repository';
-import { mockUsers } from './mocks/user';
+
 import { messages } from './constants/messages';
 import { UserNotDeletedError, UserNotFoundError } from './constants/errors';
+import { UserServiceMock } from './mocks/user-service';
+import { CreateUserDto } from './dto/create-user.dto';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -17,6 +19,10 @@ describe('UserController', () => {
       controllers: [UserController],
       providers: [
         UserService,
+        {
+          provide: UserService,
+          useValue: UserServiceMock,
+        },
         {
           provide: getRepositoryToken(User),
           useValue: mockUserRepository,
@@ -32,27 +38,26 @@ describe('UserController', () => {
   });
 
   it('should create a user', async function () {
-    const newUser = await controller.create({
+    const createUserRequestBody: CreateUserDto = {
       email: 'test-email@provider.com ',
-    });
+    };
+    await controller.create(createUserRequestBody);
 
-    expect(newUser.email).toBeTruthy();
-    expect(isUUID(newUser.id)).toBe(true);
-
-    // Testing interceptors as a part of the request flow can only be done in e2e and partial integration test
-    expect(newUser.consents).toBe(undefined);
+    expect(UserServiceMock.create).toHaveBeenCalledTimes(1);
+    expect(UserServiceMock.create).toHaveBeenCalledWith(createUserRequestBody);
   });
 
   it('should get a user', async function () {
-    mockUserRepository.findOne.mockReturnValueOnce(mockUsers[0]);
-    const foundUser = (await controller.findOne('my_uuid')) as User;
-    expect(isUUID(foundUser.id)).toBe(true);
+    await controller.findOne('my_uuid');
+    expect(UserServiceMock.findOne).toHaveBeenCalledTimes(1);
+    expect(UserServiceMock.findOne).toHaveBeenCalledWith('my_uuid');
   });
 
   it('should return a message if user could not be found', async function () {
     expect.assertions(1);
     try {
       const id = 'my_uuid';
+      UserServiceMock.findOne.mockRejectedValueOnce(new UserNotFoundError(id));
       await controller.findOne(id);
     } catch (e) {
       expect(e instanceof UserNotFoundError).toBe(true);
@@ -60,13 +65,15 @@ describe('UserController', () => {
   });
 
   it('should return a message upon deleting a user', async function () {
-    mockUserRepository.update.mockReturnValueOnce({ affected: 1 });
+    UserServiceMock.remove.mockReturnValue(true);
     const response = await controller.remove('my_uuid');
     expect(response.message).toBe(messages.userDeleted);
   });
 
   it('should return a message if user could not be deleted', async function () {
-    mockUserRepository.update.mockReturnValueOnce({ affected: 0 });
+    UserServiceMock.remove.mockRejectedValueOnce(
+      new UserNotDeletedError('my_uuid'),
+    );
     expect.assertions(1);
     try {
       await controller.remove('my_uuid');

@@ -64,20 +64,26 @@ describe('UserService', () => {
     });
   });
 
-  describe('findOne()', function () {
+  describe('queryBuilder()', function () {
     it('should find a user by id && active === true', async function () {
-      mockUserRepository.findOne.mockReturnValueOnce(mockUserWithoutEvents);
+      const { getOneMock, whereMock } = mockUserRepository;
+      getOneMock.mockReturnValue(mockUserWithoutEvents);
 
       await service.findOne(mockUserWithoutEvents.id);
-      expect(mockUserRepository.findOne).toHaveBeenCalledTimes(1);
-      expect(mockUserRepository.findOne).toHaveBeenCalledWith({
+
+      expect(getOneMock).toHaveBeenCalledTimes(1);
+      expect(whereMock).toHaveBeenCalledWith({
         id: mockUserWithoutEvents.id,
         active: true,
       });
     });
 
     it('should throw a UserNotFoundError in case the user cannot be found', async function () {
-      mockUserRepository.findOne.mockReturnValueOnce(null);
+      const { getOne: getOneMock } = mockUserRepository
+        .createQueryBuilder()
+        .leftJoinAndSelect()
+        .where();
+      getOneMock.mockReturnValueOnce(null);
       expect.assertions(1);
 
       try {
