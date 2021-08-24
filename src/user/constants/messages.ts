@@ -3,4 +3,5 @@ export const messages = {
   userDeleted: 'user successfully deleted',
   userNotDeleted: (id) => `could not delete user with id ${id}`,
   duplicateEmailError: 'a user already exists with this email',
+  invalidEmailError: 'this email address is not valid',
 };

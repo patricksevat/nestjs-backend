@@ -25,6 +25,18 @@ export class DuplicateEmailError extends UserServiceError {
   };
 }
 
+export class InvalidEmailError extends UserServiceError {
+  constructor() {
+    super(messages.invalidEmailError);
+    this.name = 'InvalidEmailError';
+  }
+
+  errorResponse = {
+    status: HttpStatus.BAD_REQUEST,
+    error: this.message,
+  };
+}
+
 export class UserNotFoundError extends UserServiceError {
   constructor(id: string) {
     super(messages.idNotFound(id));

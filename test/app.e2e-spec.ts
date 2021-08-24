@@ -9,7 +9,10 @@ import { IUserResponse } from '../src/user/entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { mockUserRepository } from '../src/user/mocks/user-repository';
 import { v4 as uuidv4 } from 'uuid';
-import { DuplicateEmailError } from '../src/user/constants/errors';
+import {
+  DuplicateEmailError,
+  InvalidEmailError,
+} from '../src/user/constants/errors';
 
 describe('App (e2e)', () => {
   let app: INestApplication;
@@ -67,10 +70,14 @@ describe('App (e2e)', () => {
   });
 
   it('/v1/user (POST) (400 / Duplicate email)', () => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    mockUserRepository.save.mockRejectedValueOnce(new DuplicateEmailError());
+    return request(app.getHttpServer())
+      .post('/v1/user')
+      .send({ email: userEmail })
+      .expect(400)
+      .expect({ status: 400, error: messages.duplicateEmailError });
+  });
 
+  it('/v1/user (POST) (400 / Invalid email)', () => {
     return request(app.getHttpServer())
       .post('/v1/user')
       .send({ email: userEmail })
