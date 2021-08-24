@@ -21,6 +21,10 @@ Subsequent times:
 
 - pgAdmin
 
+### Remarks
+
+Could have made a shared module with stuff like interceptors, exception filters and pipes. Would've made it a bit cleaner
+
 ## The challenge
 
 You're building a Preference Center for your users where they can manage their choice regarding the channel they want to get notified on. They can choose between getting notified by email, SMS, neither, or both. To do this you need to provide an API to manage your users and their consents.

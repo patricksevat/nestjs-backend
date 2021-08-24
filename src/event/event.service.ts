@@ -3,6 +3,7 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EventEntity } from './entities/event.entity';
 import { DeepPartial, Repository } from 'typeorm';
+import { TypeOrmErrors, UserIdNotFoundError } from './constants/errors';
 
 @Injectable()
 export class EventService {
@@ -12,14 +13,21 @@ export class EventService {
   ) {}
 
   async create(createEventDto: CreateEventDto) {
-    const activeEvent = await this.eventsRepository.findOne({
-      userId: createEventDto.user.id,
-      active: true,
-    });
+    try {
+      const activeEvent = await this.eventsRepository.findOne({
+        userId: createEventDto.user.id,
+        active: true,
+      });
 
-    const newEvent = this.createNewEvent(activeEvent, createEventDto);
-    const [savedNewEvent] = await this.saveEntities(newEvent, activeEvent);
-    return savedNewEvent;
+      const newEvent = this.createNewEvent(activeEvent, createEventDto);
+      const [savedNewEvent] = await this.saveEntities(newEvent, activeEvent);
+      return savedNewEvent;
+    } catch (e) {
+      if (e?.message?.includes(TypeOrmErrors.foreignKeyConstraint)) {
+        throw new UserIdNotFoundError();
+      }
+      throw e;
+    }
   }
 
   private createNewEvent(
