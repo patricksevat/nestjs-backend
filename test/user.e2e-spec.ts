@@ -7,14 +7,9 @@ import { messages } from '../src/user/constants/messages';
 import { isUUID } from '@nestjs/common/utils/is-uuid';
 import { IUserResponse } from '../src/user/entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { mockUserRepository } from '../src/user/mocks/user-repository';
 import { v4 as uuidv4 } from 'uuid';
-import {
-  DuplicateEmailError,
-  InvalidEmailError,
-} from '../src/user/constants/errors';
 
-describe('App (e2e)', () => {
+describe('User (e2e)', () => {
   let app: INestApplication;
   let moduleRef: TestingModule;
   const userEmail = fakerInternet.email();
@@ -47,13 +42,6 @@ describe('App (e2e)', () => {
   });
 
   it('/v1/user (POST) (200)', () => {
-    mockUserRepository.save.mockReturnValueOnce({
-      active: true,
-      id: uuidv4,
-      email: userEmail,
-      events: null,
-    });
-
     return request(app.getHttpServer())
       .post('/v1/user')
       .send({ email: userEmail })

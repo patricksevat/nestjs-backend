@@ -58,21 +58,36 @@ describe('EventService', () => {
 
       await service.create(mockCreateEvent.dto);
       expect(mockEventRepository.save).toHaveBeenCalledTimes(1);
-      expect(mockEventRepository.save).toHaveBeenCalledWith(
+      expect(mockEventRepository.save).toHaveBeenCalledWith([
         eventEntityToCreate,
-      );
+      ]);
     });
 
     it('should deactivate the existing active event for the user', async function () {
+      mockEventRepository.findOne.mockReturnValue({ id: '123' });
       await service.create(mockCreateEvent.dto);
-      expect(mockEventRepository.update).toHaveBeenCalledTimes(1);
-      expect(mockEventRepository.update).toHaveBeenCalledWith(
-        {
-          user: mockCreateEvent.dto.user.id,
-          active: true,
-        },
-        { active: false },
-      );
+      expect(mockEventRepository.save).toHaveBeenCalledTimes(1);
+
+      const firstCall = mockEventRepository.save.mock.calls[0];
+      const firstArgumentIsAnArray = firstCall[0];
+      expect(firstArgumentIsAnArray[1]).toMatchObject({
+        id: '123',
+        active: false,
+      });
+    });
+
+    it('should apply the new consents to the existing consents', async function () {
+      mockEventRepository.findOne.mockReturnValue({
+        sms_notifications: false,
+        email_notifications: true,
+      });
+      await service.create(mockCreateEvent.dto);
+      const firstCall = mockEventRepository.save.mock.calls[0];
+      const firstArgumentIsAnArray = firstCall[0];
+      const createdEvent: EventEntity = firstArgumentIsAnArray[0];
+
+      expect(createdEvent.email_notifications).toBe(true);
+      expect(createdEvent.sms_notifications).toBe(true);
     });
 
     it('should throw error when user cannot be found', async function () {

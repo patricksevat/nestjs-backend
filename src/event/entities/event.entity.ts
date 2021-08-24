@@ -29,4 +29,7 @@ export class EventEntity {
     cascade: ['insert'],
   })
   user: User;
+
+  @Column({ nullable: true })
+  userId: string;
 }

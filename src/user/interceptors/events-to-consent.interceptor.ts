@@ -28,26 +28,19 @@ export class EventsToConsentInterceptor implements NestInterceptor {
   }
 
   getConsents(activeEvent: EventEntity): IConsent[] {
-    const consents: IConsent[] = [];
-
     if (!activeEvent) {
       return [];
     }
 
-    if (activeEvent.sms_notifications) {
-      consents.push({
+    return [
+      {
         id: 'sms_notifications',
-        enabled: true,
-      });
-    }
-
-    if (activeEvent.email_notifications) {
-      consents.push({
+        enabled: activeEvent.sms_notifications || false,
+      },
+      {
         id: 'email_notifications',
-        enabled: true,
-      });
-    }
-
-    return consents;
+        enabled: activeEvent.email_notifications || false,
+      },
+    ];
   }
 }

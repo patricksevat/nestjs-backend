@@ -3,7 +3,8 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EventEntity } from './entities/event.entity';
 import { UserService } from '../user/user.service';
-import { Repository } from 'typeorm';
+import { DeepPartial, Repository } from 'typeorm';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class EventService {
@@ -14,24 +15,51 @@ export class EventService {
   ) {}
 
   async create(createEventDto: CreateEventDto) {
-    await this.deactivateEvent(createEventDto.user.id);
-    return this.createEvent(createEventDto);
+    const [user, activeEvent] = await this.getUserAndActiveEvent(
+      createEventDto.user.id,
+    );
+
+    const newEvent = this.createNewEvent(user, activeEvent, createEventDto);
+    return this.saveEntities(newEvent, activeEvent);
   }
 
-  private async createEvent(createEventDto: CreateEventDto) {
+  private async getUserAndActiveEvent(
+    userId: string,
+  ): Promise<[User, EventEntity]> {
+    const userPromise = this.userService.findOne(userId);
+    const activeEventPromise = this.eventsRepository.findOne({
+      userId,
+      active: true,
+    });
+    return Promise.all([userPromise, activeEventPromise]);
+  }
+
+  private createNewEvent(
+    user: User,
+    activeEvent: EventEntity,
+    createEventDto: CreateEventDto,
+  ): EventEntity {
     const newEvent = new EventEntity();
-    newEvent.user = await this.userService.findOne(createEventDto.user.id);
+    newEvent.user = user;
+    newEvent.email_notifications = activeEvent?.email_notifications;
+    newEvent.sms_notifications = activeEvent?.sms_notifications;
 
     createEventDto.consents.forEach((consent) => {
       newEvent[consent.id] = consent.enabled;
     });
-    return this.eventsRepository.save(newEvent);
+
+    return newEvent;
   }
 
-  private deactivateEvent(userId) {
-    return this.eventsRepository.update(
-      { user: userId, active: true },
-      { active: false },
-    );
+  private saveEntities(newEvent: EventEntity, activeEvent: EventEntity) {
+    const entitiesToSave: DeepPartial<EventEntity>[] = [newEvent];
+    if (activeEvent) {
+      entitiesToSave.push({
+        id: activeEvent.id,
+        active: false,
+      });
+    }
+
+    return this.eventsRepository.save(entitiesToSave);
   }
 }

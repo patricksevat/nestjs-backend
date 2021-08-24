@@ -23,6 +23,7 @@ export const mockCreateEvent: {
     mockEvent.id = uuidv4();
     mockEvent.user = user;
     mockEvent.sms_notifications = true;
+    mockEvent.email_notifications = undefined;
     return mockEvent;
   },
 };
