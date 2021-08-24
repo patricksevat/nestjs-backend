@@ -20,7 +20,7 @@ export class DuplicateEmailError extends UserServiceError {
   }
 
   errorResponse = {
-    status: HttpStatus.BAD_REQUEST,
+    status: HttpStatus.UNPROCESSABLE_ENTITY,
     error: this.message,
   };
 }
@@ -32,7 +32,7 @@ export class InvalidEmailError extends UserServiceError {
   }
 
   errorResponse = {
-    status: HttpStatus.BAD_REQUEST,
+    status: HttpStatus.UNPROCESSABLE_ENTITY,
     error: this.message,
   };
 }

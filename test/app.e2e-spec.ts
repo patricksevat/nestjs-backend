@@ -73,16 +73,16 @@ describe('App (e2e)', () => {
     return request(app.getHttpServer())
       .post('/v1/user')
       .send({ email: userEmail })
-      .expect(400)
-      .expect({ status: 400, error: messages.duplicateEmailError });
+      .expect(422)
+      .expect({ status: 422, error: messages.duplicateEmailError });
   });
 
   it('/v1/user (POST) (400 / Invalid email)', () => {
     return request(app.getHttpServer())
       .post('/v1/user')
       .send({ email: userEmail })
-      .expect(400)
-      .expect({ status: 400, error: messages.duplicateEmailError });
+      .expect(422)
+      .expect({ status: 422, error: messages.duplicateEmailError });
   });
 
   it('/v1/user (GET) (200)', function () {
