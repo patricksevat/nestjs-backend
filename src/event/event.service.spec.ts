@@ -9,6 +9,8 @@ import { EventEntity } from './entities/event.entity';
 import { mockEventRepository } from './mocks/event-entity-repository';
 import { mockCreateEvent } from './mocks/event';
 import { mockUserWithoutEvents } from '../user/mocks/user';
+import { UserServiceMock } from '../user/mocks/user-service';
+import { UserNotFoundError } from '../user/constants/errors';
 
 describe('EventService', () => {
   let service: EventService;
@@ -24,7 +26,10 @@ describe('EventService', () => {
       controllers: [EventController],
       providers: [
         EventService,
-        UserService,
+        {
+          provide: UserService,
+          useValue: UserServiceMock,
+        },
         {
           provide: getRepositoryToken(User),
           useValue: mockUserRepository,
@@ -45,15 +50,42 @@ describe('EventService', () => {
 
   describe('create()', function () {
     it('should create an event', async function () {
-      // await service.create(mockCreateEvent.dto);
-      // expect(mockEventRepository.save).toHaveBeenCalledTimes(1);
-      // expect(mockEventRepository.save).toHaveBeenCalledWith(
-      //   mockCreateEvent.eventEntity,
-      // );
+      const eventEntityToCreate = mockCreateEvent.eventEntity(
+        mockUserWithoutEvents,
+      );
+      delete eventEntityToCreate.id;
+      UserServiceMock.findOne.mockReturnValue(mockUserWithoutEvents);
+
+      await service.create(mockCreateEvent.dto);
+      expect(mockEventRepository.save).toHaveBeenCalledTimes(1);
+      expect(mockEventRepository.save).toHaveBeenCalledWith(
+        eventEntityToCreate,
+      );
     });
 
-    it('should deactivate the existing active event for the user', function () {});
+    it('should deactivate the existing active event for the user', async function () {
+      await service.create(mockCreateEvent.dto);
+      expect(mockEventRepository.update).toHaveBeenCalledTimes(1);
+      expect(mockEventRepository.update).toHaveBeenCalledWith(
+        {
+          user: mockCreateEvent.dto.user.id,
+          active: true,
+        },
+        { active: false },
+      );
+    });
 
-    it('should handle error when user cannot be found', function () {});
+    it('should throw error when user cannot be found', async function () {
+      expect.assertions(1);
+      UserServiceMock.findOne.mockRejectedValueOnce(
+        new UserNotFoundError(mockCreateEvent.dto.user.id),
+      );
+
+      try {
+        await service.create(mockCreateEvent.dto);
+      } catch (e) {
+        expect(e instanceof UserNotFoundError).toBe(true);
+      }
+    });
   });
 });
