@@ -3,9 +3,11 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { IUserResponse } from '../src/user/entities/user.entity';
 import { isUUID } from '@nestjs/common/utils/is-uuid';
 import { internet as fakerInternet } from 'faker';
+import { IEventCreationResponse } from '../src/event/entities/event.entity';
+import { v4 as uuidv4 } from 'uuid';
+import { messages } from '../src/event/constants/messages';
 
 describe('Event (e2e)', () => {
   let app: INestApplication;
@@ -48,7 +50,7 @@ describe('Event (e2e)', () => {
       });
   });
 
-  it('/v1/event (POST) 200', function () {
+  it('/v1/event (POST) 201', function () {
     return request(app.getHttpServer())
       .post('/v1/event')
       .send({
@@ -58,18 +60,61 @@ describe('Event (e2e)', () => {
         consents: [
           {
             id: 'sms_notifications',
-            enabled: false,
+            enabled: true,
           },
         ],
       })
       .expect(201)
       .then((result) => {
-        const body: IUserResponse = result.body;
+        const body: IEventCreationResponse = result.body;
 
         expect(isUUID(body.id)).toBe(true);
-        expect(body.email).toBe(userEmail);
-        expect(Array.isArray(body.consents)).toBe(true);
-        expect(body.consents).toHaveLength(0);
+        expect(isUUID(body.userId)).toBe(true);
+        expect(body.sms_notifications).toBe(true);
+        expect(body.email_notifications).toBe(false);
       });
+  });
+
+  it('/v1/event (POST) 201 (merge with previous consents)', function () {
+    return request(app.getHttpServer())
+      .post('/v1/event')
+      .send({
+        user: {
+          id: userId,
+        },
+        consents: [
+          {
+            id: 'email_notifications',
+            enabled: true,
+          },
+        ],
+      })
+      .expect(201)
+      .then((result) => {
+        const body: IEventCreationResponse = result.body;
+
+        expect(isUUID(body.id)).toBe(true);
+        expect(isUUID(body.userId)).toBe(true);
+        expect(body.sms_notifications).toBe(true);
+        expect(body.email_notifications).toBe(true);
+      });
+  });
+
+  it('/v1/event (POST) 400 (UserIdNotFoundError)', function () {
+    return request(app.getHttpServer())
+      .post('/v1/event')
+      .send({
+        user: {
+          id: uuidv4(),
+        },
+        consents: [
+          {
+            id: 'sms_notifications',
+            enabled: true,
+          },
+        ],
+      })
+      .expect(400)
+      .expect({ error: messages.userIdNotFound, status: 400 });
   });
 });

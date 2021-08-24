@@ -33,3 +33,11 @@ export class EventEntity {
   @Column({ nullable: true })
   userId: string;
 }
+
+export interface IEventCreationResponse {
+  userId: string;
+  email_notifications: boolean;
+  sms_notifications: boolean;
+  id: string;
+  timestamp: string;
+}
