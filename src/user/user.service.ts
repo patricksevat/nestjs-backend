@@ -31,10 +31,11 @@ export class UserService {
   }
 
   async findOne(id: string) {
-    const foundUser = await this.userRepository.findOne({
-      id,
-      active: true,
-    });
+    const foundUser = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.events', 'event', 'event.active = true')
+      .where({ id, active: true })
+      .getOne();
 
     if (!foundUser) {
       throw new UserNotFoundError(id);

@@ -1,26 +1,34 @@
 import { Injectable } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
-import { UpdateEventDto } from './dto/update-event.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { EventEntity } from './entities/event.entity';
+import { UserService } from '../user/user.service';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class EventService {
-  create(createEventDto: CreateEventDto) {
-    return 'This action adds a new event';
+  constructor(
+    @InjectRepository(EventEntity)
+    private eventsRepository: Repository<EventEntity>,
+    private userService: UserService,
+  ) {}
+
+  async create(createEventDto: CreateEventDto) {
+    await this.deactivateEvent(createEventDto.user.id);
+    return this.createEvent(createEventDto);
   }
 
-  findAll() {
-    return `This action returns all event`;
+  async createEvent(createEventDto: CreateEventDto) {
+    const newEvent = new EventEntity();
+    newEvent.user = await this.userService.findOne(createEventDto.user.id);
+
+    createEventDto.consents.forEach((consent) => {
+      newEvent[consent.id] = consent.enabled;
+    });
+    return this.eventsRepository.save(newEvent);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} event`;
-  }
-
-  update(id: number, updateEventDto: UpdateEventDto) {
-    return `This action updates a #${id} event`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} event`;
+  deactivateEvent(userId) {
+    return this.eventsRepository.update({ user: userId }, { active: false });
   }
 }

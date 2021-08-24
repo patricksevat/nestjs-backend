@@ -2,10 +2,10 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  ManyToOne,
   Unique,
+  OneToMany,
 } from 'typeorm';
-import { Event } from '../../event/entities/event.entity';
+import { EventEntity } from '../../event/entities/event.entity';
 
 @Entity()
 @Unique(['email'])
@@ -19,8 +19,8 @@ export class User {
   @Column()
   email: string;
 
-  @ManyToOne(() => Event, (event) => event.user)
-  events: Event[];
+  @OneToMany(() => EventEntity, (event) => event.user)
+  events: EventEntity[];
 }
 
 export interface IConsent {

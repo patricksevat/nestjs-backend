@@ -11,7 +11,7 @@ import { mockUserRepository } from '../src/user/mocks/user-repository';
 import { v4 as uuidv4 } from 'uuid';
 import { DuplicateEmailError } from '../src/user/constants/errors';
 
-describe('AppController (e2e)', () => {
+describe('App (e2e)', () => {
   let app: INestApplication;
   let moduleRef: TestingModule;
   const userEmail = fakerInternet.email();

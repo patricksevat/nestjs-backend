@@ -9,22 +9,24 @@ import { User } from '../../user/entities/user.entity';
 
 @Entity()
 @Index(['user', 'active']) // TODO don't know if this will work
-export class Event {
+export class EventEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ default: true })
   active: boolean;
 
-  @Column()
-  email: boolean;
+  @Column({ default: false })
+  email_notifications: boolean;
 
-  @Column()
-  sms: boolean;
+  @Column({ default: false })
+  sms_notifications: boolean;
 
-  @Column('timestamp')
+  @Column('timestamp', { default: () => 'now()' })
   timestamp: string;
 
-  @ManyToOne(() => User, (user) => user.events)
+  @ManyToOne(() => User, (user) => user.events, {
+    cascade: ['insert'],
+  })
   user: User;
 }

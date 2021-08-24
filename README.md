@@ -12,10 +12,10 @@
 ### Run
 
 First time: 
-`yarn db:create && yarn start`
+`yarn db:create && yarn start:dev`
 
 Subsequent times:
-`yarn db:start && yarn start`
+`yarn db:start && yarn start:dev`
 
 ### Useful
 
