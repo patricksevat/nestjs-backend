@@ -46,4 +46,9 @@ describe('EventController', () => {
     expect(EventServiceMock.create).toHaveBeenCalledTimes(1);
     expect(EventServiceMock.create).toHaveBeenCalledWith(mockCreateEvent.dto);
   });
+
+  it('should get all events', async function () {
+    await controller.getAllEvents();
+    expect(EventServiceMock.getAll).toHaveBeenCalledTimes(1);
+  });
 });

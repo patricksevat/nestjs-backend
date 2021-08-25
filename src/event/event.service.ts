@@ -12,6 +12,10 @@ export class EventService {
     private eventsRepository: Repository<EventEntity>,
   ) {}
 
+  async getAll() {
+    return this.eventsRepository.find();
+  }
+
   async create(createEventDto: CreateEventDto) {
     try {
       const activeEvent = await this.eventsRepository.findOne({

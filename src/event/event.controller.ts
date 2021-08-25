@@ -25,7 +25,8 @@ export class EventController {
   @UseGuards(RolesGuard)
   @Roles(RoleEnum.admin)
   async getAllEvents() {
-    return 'isAdmin';
+    // TODO eventually we want to add pagination etc, but out of scope for now
+    return this.eventService.getAll();
   }
 
   @Post()

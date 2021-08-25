@@ -117,4 +117,18 @@ describe('Event (e2e)', () => {
       .expect(400)
       .expect({ error: messages.userIdNotFound, status: 400 });
   });
+
+  it('/v1/event (GET) 200', function () {
+    return request(app.getHttpServer())
+      .get('/v1/event')
+      .set('role', 'admin')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.length).toBeGreaterThan(1);
+      });
+  });
+
+  it('/v1/event (GET) 403', function () {
+    return request(app.getHttpServer()).get('/v1/event').expect(403);
+  });
 });

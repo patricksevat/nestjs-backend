@@ -47,7 +47,7 @@ The API you are building supports CRUD operations on `user` and `event` entities
     - If any of the requirements are not satisfied, the API must return a 422 response. ✅
 - Consent IDs can be one of the following: `email_notifications` or `sms_notifications`. ✅
 - Consent change events can only be 
-    - read and  ❌
+    - read and  ✅
     - created, ✅ 
     - not update or deleted. ✅
 - A consent change event belongs to a single user. ✅
