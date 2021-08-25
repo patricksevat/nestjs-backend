@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { V1Module } from './v1/v1.module';
 import { RouterModule } from '@nestjs/core';
+import { SharedModule } from './shared/shared.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { RouterModule } from '@nestjs/core';
       },
     ]),
     V1Module,
+    SharedModule,
   ],
   controllers: [],
   providers: [],
