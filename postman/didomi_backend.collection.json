@@ -1,0 +1,261 @@
+{
+	"info": {
+		"_postman_id": "afccb0bf-bfe4-4783-b459-c3d0a5645a28",
+		"name": "Didomi challenge",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "POST /v1/user 200",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"email\": \"patrick+8@sevat.nl\" }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/v1/user",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST /v1/user 422 (DuplicateEmailError)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"email\": \"patrick+8@sevat.nl\" }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/v1/user",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST /v1/user 422 (InvalidEmailError)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"email\": \"patrick\" }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/v1/user",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /v1/user/:id 200",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/v1/user/0421973f-2e00-4f4e-9184-ad00d17c840f",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"user",
+						"0421973f-2e00-4f4e-9184-ad00d17c840f"
+					]
+				},
+				"description": "GET /v1/user/:id (200)"
+			},
+			"response": []
+		},
+		{
+			"name": "GET /v1/user/:id 400 (UserNotFound)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/v1/user/1421973f-2e00-4f4e-9184-ad00d17c840f",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"user",
+						"1421973f-2e00-4f4e-9184-ad00d17c840f"
+					]
+				},
+				"description": "GET /v1/user/:id (200)"
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE /v1/user/:id 400 (UserNotDeleted)",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/v1/user/2ddaa8d8-f5fe-4f33-bfe5-948980566806",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"user",
+						"2ddaa8d8-f5fe-4f33-bfe5-948980566806"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST /v1/event 200",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"user\": {\n        \"id\": \"0bdd8f69-faea-49c4-b392-7c08227cbba5\"\n    },\n    \"consents\": [{\n        \"id\": \"sms_notifications\",\n        \"enabled\": false\n    }]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/v1/event",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"event"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST /v1/event 400 (UserIdNotFound)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"user\": {\n        \"id\": \"0bdd8f69-faea-49c4-b392-7c08227cbba6\"\n    },\n    \"consents\": [{\n        \"id\": \"sms_notifications\",\n        \"enabled\": false\n    }]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/v1/event",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"event"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /v1/event 200",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "role",
+						"value": "admin",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "localhost:3000/v1/event",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"event"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /v1/event 403 (Unauthorized)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "role",
+						"type": "text",
+						"value": "user"
+					}
+				],
+				"url": {
+					"raw": "localhost:3000/v1/event",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"event"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

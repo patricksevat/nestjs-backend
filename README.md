@@ -17,13 +17,23 @@ First time:
 Subsequent times:
 `yarn db:start && yarn start:dev`
 
+### Test
+
+Unit test
+`yarn test`
+
+E2E
+`yarn test:e2e`
+
 ### Useful
 
 - pgAdmin
+- `postman/didomi_backend.collection.json` provides a Postman collection. Of course, id's might need to be changed
 
 ### Remarks
 
-Could have made a shared module with stuff like interceptors, exception filters and pipes. Would've made it a bit cleaner
+- Could have made a shared module with stuff like interceptors, exception filters and pipes. Would've made it a bit cleaner
+- In the architecture doc (wrote at the start), I've added some suggestions for middleware. Have not added these due to time constraints
 
 ## The challenge
 
